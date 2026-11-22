@@ -1,6 +1,5 @@
 package com.wateen.launcher.data
 
-import android.os.Build
 import com.wateen.launcher.Config
 import java.time.LocalDate
 import java.time.chrono.HijrahDate
@@ -46,7 +45,6 @@ fun gregorian(ms: Long): String {
 }
 
 fun hijriLocal(): String {
-    if (Build.VERSION.SDK_INT < 26) return ""
     return try {
         val h = HijrahDate.from(LocalDate.now().plusDays(Config.HIJRI_OFFSET_DAYS))
         h.get(ChronoField.DAY_OF_MONTH).toString() + " " +

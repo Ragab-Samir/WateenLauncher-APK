@@ -1,6 +1,5 @@
 package com.wateen.launcher.data
 
-import android.os.Build
 import android.text.Html
 import android.util.Xml
 import com.wateen.launcher.Config
@@ -226,15 +225,8 @@ object Info {
         return parseTitles(body).take(8).map { "$label: $it" }
     }
 
-    @Suppress("DEPRECATION")
-    private fun clean(s: String): String {
-        val plain = if (Build.VERSION.SDK_INT >= 24) {
-            Html.fromHtml(s, Html.FROM_HTML_MODE_LEGACY).toString()
-        } else {
-            Html.fromHtml(s).toString()
-        }
-        return plain.replace(Regex("\\s+"), " ").trim()
-    }
+    private fun clean(s: String): String =
+        Html.fromHtml(s, Html.FROM_HTML_MODE_LEGACY).toString().replace(Regex("\\s+"), " ").trim()
 
     private fun parseTitles(xml: String): List<String> {
         val out = ArrayList<String>()

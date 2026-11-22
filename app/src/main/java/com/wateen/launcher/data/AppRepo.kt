@@ -3,7 +3,6 @@ package com.wateen.launcher.data
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.drawable.toBitmap
@@ -30,9 +29,7 @@ object AppRepo {
                 }
                 val isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) != 0 &&
                     (ai.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0
-                @Suppress("DEPRECATION")
-                val isGame = if (Build.VERSION.SDK_INT >= 26) ai.category == ApplicationInfo.CATEGORY_GAME
-                else (ai.flags and ApplicationInfo.FLAG_IS_GAME) != 0
+                val isGame = ai.category == ApplicationInfo.CATEGORY_GAME
                 out.add(AppItem(pkg, label, icon, isSystem, isGame))
             }
         }
