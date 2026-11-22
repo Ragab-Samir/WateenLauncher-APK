@@ -1,6 +1,15 @@
 package com.wateen.launcher.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -171,5 +180,72 @@ fun PinDialog(title: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+enum class IconType { WIFI, BLUETOOTH, PICTURE, SETTINGS }
+
+@Composable
+fun TvIcon(type: IconType, color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier) {
+        val s = size.minDimension
+        when (type) {
+            IconType.WIFI -> {
+                val st = Stroke(width = s * 0.09f, cap = StrokeCap.Round)
+                val cx = s / 2f
+                val cy = s * 0.80f
+                for (r in listOf(0.64f, 0.42f, 0.22f)) {
+                    val rad = s * r
+                    drawArc(color, -135f, 90f, false, Offset(cx - rad, cy - rad), Size(rad * 2f, rad * 2f), style = st)
+                }
+                drawCircle(color, s * 0.06f, Offset(cx, cy))
+            }
+            IconType.BLUETOOTH -> {
+                val p = Path()
+                p.moveTo(s * 0.28f, s * 0.30f)
+                p.lineTo(s * 0.72f, s * 0.68f)
+                p.lineTo(s * 0.50f, s * 0.88f)
+                p.lineTo(s * 0.50f, s * 0.12f)
+                p.lineTo(s * 0.72f, s * 0.32f)
+                p.lineTo(s * 0.28f, s * 0.70f)
+                drawPath(p, color, style = Stroke(width = s * 0.09f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+            }
+            IconType.PICTURE -> {
+                drawRoundRect(
+                    color, Offset(s * 0.08f, s * 0.16f), Size(s * 0.84f, s * 0.56f),
+                    CornerRadius(s * 0.07f), style = Stroke(width = s * 0.08f)
+                )
+                drawLine(color, Offset(s * 0.50f, s * 0.72f), Offset(s * 0.50f, s * 0.84f), strokeWidth = s * 0.08f, cap = StrokeCap.Round)
+                drawLine(color, Offset(s * 0.32f, s * 0.86f), Offset(s * 0.68f, s * 0.86f), strokeWidth = s * 0.08f, cap = StrokeCap.Round)
+                drawCircle(color, s * 0.06f, Offset(s * 0.32f, s * 0.34f))
+                val m = Path()
+                m.moveTo(s * 0.20f, s * 0.60f)
+                m.lineTo(s * 0.40f, s * 0.42f)
+                m.lineTo(s * 0.54f, s * 0.54f)
+                m.lineTo(s * 0.64f, s * 0.46f)
+                m.lineTo(s * 0.80f, s * 0.60f)
+                m.close()
+                drawPath(m, color)
+            }
+            IconType.SETTINGS -> {
+                val c = Offset(s / 2f, s / 2f)
+                drawCircle(color, s * 0.26f, c, style = Stroke(width = s * 0.12f))
+                for (i in 0 until 8) {
+                    rotate(degrees = i * 45f, pivot = c) {
+                        drawRoundRect(
+                            color, Offset(s * 0.44f, s * 0.08f), Size(s * 0.12f, s * 0.16f),
+                            CornerRadius(s * 0.03f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TvIconButton(type: IconType, onClick: () -> Unit) {
+    FocusBox(Modifier.size(48.dp), shape = CircleShape, onClick = onClick) { focused ->
+        TvIcon(type, if (focused) Gold else TextW, Modifier.align(Alignment.Center).size(26.dp))
     }
 }

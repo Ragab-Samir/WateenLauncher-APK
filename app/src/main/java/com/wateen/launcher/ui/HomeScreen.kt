@@ -77,7 +77,7 @@ fun HomeScreen(activity: ComponentActivity, roleLauncher: ActivityResultLauncher
     var prayer by remember { mutableStateOf(PrayerInfo(Config.DEFAULT_PRAYERS, null)) }
     var gold by remember { mutableStateOf(store.gold) }
     var weather by remember { mutableStateOf<Weather?>(null) }
-    var news by remember { mutableStateOf(Config.NEWS_DEFAULT) }
+    var news by remember { mutableStateOf(store.news ?: Config.NEWS_DEFAULT) }
     var stats by remember { mutableStateOf(SysStats(false, false, null)) }
     var isDefault by remember { mutableStateOf(false) }
     val firstFocus = remember { FocusRequester() }
@@ -133,14 +133,25 @@ fun HomeScreen(activity: ComponentActivity, roleLauncher: ActivityResultLauncher
     LaunchedEffect(Unit) {
         while (true) {
             val g = Info.gold()
-            if (g != null) { gold = g; store.gold = g }
-            delay(60 * 60_000L)
+            if (g != null) {
+                gold = g
+                store.gold = g
+                delay(15 * 60_000L)   // تحديث كل 15 دقيقة
+            } else {
+                delay(2 * 60_000L)    // فشل: إعادة المحاولة بعد دقيقتين
+            }
         }
     }
     LaunchedEffect(Unit) {
         while (true) {
-            news = Info.news()
-            delay(15 * 60_000L)
+            val n = Info.news()
+            if (n != null) {
+                news = n
+                store.news = n
+                delay(10 * 60_000L)   // تحديث الأخبار كل 10 دقائق
+            } else {
+                delay(2 * 60_000L)
+            }
         }
     }
     LaunchedEffect(Unit) {
@@ -263,8 +274,14 @@ fun HomeScreen(activity: ComponentActivity, roleLauncher: ActivityResultLauncher
         Column(
             Modifier.fillMaxSize().background(Bg).padding(horizontal = 28.dp, vertical = 14.dp)
         ) {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
                 W(Config.TOP_TEXT, 30, Gold, true)
+                Row(Modifier.align(Alignment.CenterEnd), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    TvIconButton(IconType.WIFI) { SystemTools.openWifi(ctx) }
+                    TvIconButton(IconType.BLUETOOTH) { SystemTools.openBluetooth(ctx) }
+                    TvIconButton(IconType.PICTURE) { SystemTools.openPictureSettings(ctx) }
+                    TvIconButton(IconType.SETTINGS) { SystemTools.openSettings(ctx) }
+                }
             }
             Spacer(Modifier.height(8.dp))
 
@@ -273,7 +290,7 @@ fun HomeScreen(activity: ComponentActivity, roleLauncher: ActivityResultLauncher
 
                 Column(Modifier.weight(1f).fillMaxHeight()) {
                     Row(
-                        Modifier.fillMaxWidth().height(150.dp),
+                        Modifier.fillMaxWidth().height(160.dp),
                         horizontalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         StatusPanel(weather, stats, Modifier.width(200.dp).fillMaxHeight())

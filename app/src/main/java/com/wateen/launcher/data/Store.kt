@@ -35,13 +35,25 @@ class Store(ctx: Context) {
 
     var gold: GoldRates
         get() {
-            val s = p.getString("gold", null) ?: return Config.DEFAULT_GOLD
+            val raw = p.getString("gold", null) ?: return Config.DEFAULT_GOLD
             return try {
-                val a = s.split(",").map { it.toInt() }
-                GoldRates(a[0], a[1], a[2], a[3])
+                val parts = raw.split("|", limit = 2)
+                val a = parts[0].split(",")
+                GoldRates(
+                    a[0].toInt(), a[1].toInt(), a[2].toInt(), a[3].toInt(),
+                    if (a.size > 4) a[4].toLong() else 0L,
+                    if (parts.size > 1) parts[1] else ""
+                )
             } catch (e: Exception) {
                 Config.DEFAULT_GOLD
             }
         }
-        set(v) { p.edit().putString("gold", "${v.k24},${v.k21},${v.k18},${v.pound}").apply() }
+        set(v) {
+            val note = v.note.replace("|", " ")
+            p.edit().putString("gold", "${v.k24},${v.k21},${v.k18},${v.pound},${v.updated}|$note").apply()
+        }
+
+    var news: String?
+        get() = p.getString("news", null)
+        set(v) { p.edit().putString("news", v).apply() }
 }

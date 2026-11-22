@@ -1,24 +1,30 @@
 package com.wateen.launcher.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +43,7 @@ import com.wateen.launcher.data.hijriLocal
 import com.wateen.launcher.data.nextPrayer
 import com.wateen.launcher.data.to12
 import com.wateen.launcher.data.weatherSymbol
+import kotlinx.coroutines.delay
 
 @Composable
 fun PrayerPanel(info: PrayerInfo, modifier: Modifier = Modifier) {
@@ -77,14 +84,19 @@ fun ClockWidget(hijri: String?, modifier: Modifier = Modifier) {
 @Composable
 fun GoldPanel(g: GoldRates, modifier: Modifier = Modifier) {
     Column(
-        modifier.background(Panel, RoundedCornerShape(16.dp)).padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier.background(Panel, RoundedCornerShape(16.dp)).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        W("أسعار الذهب", 18, Gold, true)
-        W("عيار 24: " + g.k24 + " ج", 16)
-        W("عيار 21: " + g.k21 + " ج", 16)
-        W("عيار 18: " + g.k18 + " ج", 16)
-        W("الجنيه الذهب: " + g.pound + " ج", 16, Gold, true)
+        W("أسعار الذهب (بيع)", 17, Gold, true)
+        W("عيار 24: " + g.k24 + " ج", 15)
+        W("عيار 21: " + g.k21 + " ج", 15)
+        W("عيار 18: " + g.k18 + " ج", 15)
+        W("الجنيه الذهب: " + g.pound + " ج", 15, Gold, true)
+        if (g.note.isNotEmpty()) {
+            W(g.note, 11, Muted, maxLines = 1)
+        } else if (g.updated > 0L) {
+            W("آخر تحديث: " + clock12(g.updated), 12, Muted)
+        }
     }
 }
 
@@ -107,19 +119,49 @@ fun StatusPanel(weather: Weather?, stats: SysStats, modifier: Modifier = Modifie
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+// شريط أخبار يتحرك باستمرار (حتى لو الخبر قصير): النص يدخل من طرف الشريط ويخرج من الطرف الآخر
 @Composable
 fun NewsTicker(text: String, modifier: Modifier = Modifier) {
-    Box(
-        modifier.fillMaxWidth().height(38.dp).background(Gold, RoundedCornerShape(10.dp)).padding(horizontal = 14.dp),
-        contentAlignment = Alignment.CenterStart
+    val scroll = rememberScrollState()
+
+    LaunchedEffect(text) {
+        scroll.scrollTo(0)
+        while (true) {
+            val max = scroll.maxValue
+            if (max <= 0 || max == Int.MAX_VALUE) {
+                delay(300)
+                continue
+            }
+            scroll.animateScrollTo(max, tween<Float>((max * 8).coerceAtLeast(4000), easing = LinearEasing))
+            scroll.scrollTo(0)
+        }
+    }
+
+    Row(
+        modifier.fillMaxWidth().height(40.dp).background(Gold, RoundedCornerShape(10.dp)),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        BasicText(
-            text = "آخر الأخبار: $text",
-            modifier = Modifier.fillMaxWidth().basicMarquee(iterations = Int.MAX_VALUE),
-            style = TextStyle(color = Bg, fontSize = 17.sp, fontWeight = FontWeight.Bold),
-            maxLines = 1,
-            softWrap = false
-        )
+        Box(
+            Modifier.fillMaxHeight().background(Bg, RoundedCornerShape(10.dp)).padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            W("آخر الأخبار", 17, Gold, true)
+        }
+        BoxWithConstraints(Modifier.weight(1f).fillMaxHeight().clipToBounds()) {
+            val w = maxWidth
+            Row(
+                Modifier.fillMaxHeight().horizontalScroll(scroll, enabled = false),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(Modifier.width(w))
+                BasicText(
+                    text = text,
+                    style = TextStyle(color = Bg, fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                    maxLines = 1,
+                    softWrap = false
+                )
+                Spacer(Modifier.width(w))
+            }
+        }
     }
 }

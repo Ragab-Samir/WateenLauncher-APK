@@ -11,7 +11,7 @@ object Config {
     const val LAT = 29.0661
     const val LON = 31.0994
 
-    // لو الإنترنت مقطوع أو الـ API فشل، تُستخدم هذه القيم
+    // تُستخدم فقط لو الإنترنت مقطوع أو الـ API فشل
     val DEFAULT_PRAYERS = listOf(
         Prayer("الفجر", "04:41"),
         Prayer("الشروق", "06:19"),
@@ -23,16 +23,19 @@ object Config {
 
     val DEFAULT_GOLD = GoldRates(6246, 5465, 4684, 43720)
 
-    const val NEWS_DEFAULT =
-        "شركة المياه في بني سويف تعلن قطع المياه عن بعض قرى ببا وناصر لأعمال الصيانة"
+    const val NEWS_DEFAULT = "جارِ تحميل آخر الأخبار..."
 
-    // ضع رابط RSS للأخبار هنا (اختياري). فارغ = يعرض الخبر الافتراضي
-    const val NEWS_RSS_URL = ""
+    // مصادر الأخبار (RSS) - تُجلب معاً وتُدمج، وتتحدث كل 10 دقائق
+    val NEWS_FEEDS = listOf(
+        "اليوم السابع" to "https://www.youm7.com/rss/SectionRss?SectionID=65",
+        "اليوم السابع - المحافظات" to "https://www.youm7.com/rss/SectionRss?SectionID=296",
+        "بي بي سي عربي" to "https://feeds.bbci.co.uk/arabic/rss.xml"
+    )
 
-    // ضع رابط JSON لأسعار الذهب هنا (اختياري) بالشكل:
-    // {"k24":6246,"k21":5465,"k18":4684,"pound":43720}
-    const val GOLD_URL = ""
+    // علاوة سوق الصاغة المحلي فوق السعر العالمي (نسبة مئوية).
+    // تُستخدم فقط في الحساب التقديري الاحتياطي لو تعذر جلب أسعار آي صاغة.
+    const val GOLD_PREMIUM_PERCENT = 2.5
 
-    // تعديل التاريخ الهجري بالأيام لو كان مختلفاً عن المعتمد عندكم (مثلاً -1 أو 1)
+    // تعديل التاريخ الهجري بالأيام لو كان مختلفاً (مثلاً -1 أو 1)
     const val HIJRI_OFFSET_DAYS = 0L
 }

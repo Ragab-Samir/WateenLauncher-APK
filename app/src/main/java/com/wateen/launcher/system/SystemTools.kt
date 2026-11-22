@@ -96,6 +96,42 @@ object SystemTools {
         }
     }
 
+    private fun startFirst(ctx: Context, intents: List<Intent>, fail: String) {
+        for (i in intents) {
+            try {
+                ctx.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return
+            } catch (e: Exception) { }
+        }
+        toast(ctx, fail)
+    }
+
+    fun openWifi(ctx: Context) = startFirst(
+        ctx,
+        listOf(
+            Intent(Settings.ACTION_WIFI_SETTINGS),
+            Intent(Settings.ACTION_WIRELESS_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS)
+        ),
+        "تعذر فتح إعدادات الواي فاي"
+    )
+
+    fun openBluetooth(ctx: Context) = startFirst(
+        ctx,
+        listOf(Intent(Settings.ACTION_BLUETOOTH_SETTINGS), Intent(Settings.ACTION_SETTINGS)),
+        "تعذر فتح إعدادات البلوتوث"
+    )
+
+    // إعدادات الصورة/العرض (السطوع، الألوان، دقة الشاشة...)
+    fun openPictureSettings(ctx: Context) = startFirst(
+        ctx,
+        listOf(
+            Intent(Settings.ACTION_DISPLAY_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS)
+        ),
+        "تعذر فتح إعدادات الصورة"
+    )
+
     fun openSettings(ctx: Context) {
         try {
             ctx.startActivity(Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
