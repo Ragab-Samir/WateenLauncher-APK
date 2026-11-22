@@ -36,6 +36,7 @@ import com.wateen.launcher.data.GoldRates
 import com.wateen.launcher.data.PrayerInfo
 import com.wateen.launcher.data.SysStats
 import com.wateen.launcher.data.Weather
+import com.wateen.launcher.data.cleanHijri
 import com.wateen.launcher.data.clock12
 import com.wateen.launcher.data.fmtRemain
 import com.wateen.launcher.data.gregorian
@@ -75,9 +76,12 @@ fun PrayerPanel(info: PrayerInfo, modifier: Modifier = Modifier) {
 @Composable
 fun ClockWidget(hijri: String?, modifier: Modifier = Modifier) {
     val now by rememberNow(5_000)
+    val hijriText = cleanHijri(hijri ?: hijriLocal())
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        W(clock12(now), 56, TextW, true)
-        W(gregorian(now) + " - " + (hijri ?: hijriLocal()), 18, Gold, align = TextAlign.Center)
+        W(clock12(now), 52, TextW, true)
+        Spacer(Modifier.height(4.dp))
+        W(gregorian(now), 16, Gold, align = TextAlign.Center, maxLines = 1)
+        W(hijriText, 16, Gold, align = TextAlign.Center, maxLines = 1)
     }
 }
 

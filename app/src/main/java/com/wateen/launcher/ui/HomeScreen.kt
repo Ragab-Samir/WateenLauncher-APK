@@ -277,9 +277,6 @@ fun HomeScreen(activity: ComponentActivity, roleLauncher: ActivityResultLauncher
             Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
                 W(Config.TOP_TEXT, 30, Gold, true)
                 Row(Modifier.align(Alignment.CenterEnd), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    TvIconButton(IconType.WIFI) { SystemTools.openWifi(ctx) }
-                    TvIconButton(IconType.BLUETOOTH) { SystemTools.openBluetooth(ctx) }
-                    TvIconButton(IconType.PICTURE) { SystemTools.openPictureSettings(ctx) }
                     TvIconButton(IconType.SETTINGS) { SystemTools.openSettings(ctx) }
                 }
             }

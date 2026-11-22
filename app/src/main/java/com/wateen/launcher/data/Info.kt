@@ -51,8 +51,10 @@ object Info {
                 Prayer("العشاء", t.getString("Isha").take(5))
             )
             val h = d.getJSONObject("date").getJSONObject("hijri")
-            val hijri = h.getString("day").toInt().toString() + " " +
+            val hijri = cleanHijri(
+                h.getString("day").toInt().toString() + " " +
                 h.getJSONObject("month").getString("ar") + " " + h.getString("year") + " هـ"
+            )
             PrayerInfo(list, hijri)
         } catch (e: Exception) {
             null
@@ -201,14 +203,46 @@ object Info {
         return null
     }
 
-    // ---------------- الأخبار ----------------
+    // ---------------- مباريات اليوم ----------------
+    suspend fun matches(): List<String> = withContext(Dispatchers.IO) {
+        val out = ArrayList<String>()
+        try {
+            val body = get("https://www.yallakora.com/match-center") ?: return@withContext emptyList()
+            val rx = Regex(
+                "class=[\"']teams teamA[\"'][^>]*>.*?<p>(.*?)</p>.*?class=[\"']teams teamB[\"'][^>]*>.*?<p>(.*?)</p>.*?class=[\"']time[\"']>(.*?)</span>",
+                RegexOption.DOT_MATCHES_ALL
+            )
+            for (m in rx.findAll(body)) {
+                val t1 = clean(m.groupValues[1])
+                val t2 = clean(m.groupValues[2])
+                val tm = clean(m.groupValues[3])
+                if (t1.isNotEmpty() && t2.isNotEmpty()) {
+                    val timeStr = if (tm.isNotEmpty()) " ($tm)" else ""
+                    out.add("⚽ $t1 × $t2$timeStr")
+                }
+            }
+        } catch (e: Exception) { }
+        out
+    }
+
+    // ---------------- الأخبار والمباريات ----------------
     // يجلب كل المصادر معاً، يدمجها بالتناوب بين المصادر، ويحذف المكرر
     suspend fun news(): String? = coroutineScope {
+        val matchesDef = async { matches() }
         val results = Config.NEWS_FEEDS.map { f -> async { fetchFeed(f.first, f.second) } }.awaitAll()
+        val matchList = matchesDef.await()
+
         val out = ArrayList<String>()
         val seen = HashSet<String>()
+
+        if (matchList.isNotEmpty()) {
+            matchList.take(12).forEach { m ->
+                if (seen.add(m)) out.add(m)
+            }
+        }
+
         var i = 0
-        while (out.size < 18 && results.any { i < it.size }) {
+        while (out.size < 25 && results.any { i < it.size }) {
             for (r in results) {
                 if (i < r.size) {
                     val t = r[i]

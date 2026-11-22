@@ -47,6 +47,12 @@ object SystemTools {
             return
         } catch (e: Exception) { }
         try {
+            if (Build.VERSION.SDK_INT >= 24) {
+                act.startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+                return
+            }
+        } catch (e: Exception) { }
+        try {
             // عند وجود أكثر من لانشر يظهر اختيار "دائماً / مرة واحدة"
             act.startActivity(
                 Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
