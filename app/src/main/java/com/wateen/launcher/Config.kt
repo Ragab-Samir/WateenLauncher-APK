@@ -1,6 +1,6 @@
 package com.wateen.launcher
 
-import com.wateen.launcher.data.Gold
+import com.wateen.launcher.data.GoldRates
 import com.wateen.launcher.data.Prayer
 
 object Config {
@@ -21,7 +21,7 @@ object Config {
         Prayer("العشاء", "18:19")
     )
 
-    val DEFAULT_GOLD = Gold(6246, 5465, 4684, 43720)
+    val DEFAULT_GOLD = GoldRates(6246, 5465, 4684, 43720)
 
     const val NEWS_DEFAULT =
         "شركة المياه في بني سويف تعلن قطع المياه عن بعض قرى ببا وناصر لأعمال الصيانة"

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wateen.launcher.Config
-import com.wateen.launcher.data.Gold
+import com.wateen.launcher.data.GoldRates
 import com.wateen.launcher.data.PrayerInfo
 import com.wateen.launcher.data.SysStats
 import com.wateen.launcher.data.Weather
@@ -75,7 +75,7 @@ fun ClockWidget(hijri: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GoldPanel(g: Gold, modifier: Modifier = Modifier) {
+fun GoldPanel(g: GoldRates, modifier: Modifier = Modifier) {
     Column(
         modifier.background(Panel, RoundedCornerShape(16.dp)).padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)

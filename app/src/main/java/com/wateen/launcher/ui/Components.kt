@@ -101,14 +101,14 @@ fun MenuDialog(title: String, items: List<Pair<String, () -> Unit>>, onDismiss: 
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 W(title, 20, Gold, true, maxLines = 1)
-                items.forEachIndexed { i, it ->
+                items.forEachIndexed { i, entry ->
                     FocusBox(
                         Modifier.fillMaxWidth().height(50.dp),
                         shape = RoundedCornerShape(10.dp),
                         focusRequester = if (i == 0) first else null,
-                        onClick = { it.second() }
+                        onClick = { entry.second() }
                     ) {
-                        W(it.first, 17, modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 14.dp))
+                        W(entry.first, 17, modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 14.dp))
                     }
                 }
             }

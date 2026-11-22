@@ -55,12 +55,12 @@ object Info {
         }
     }
 
-    suspend fun gold(): Gold? {
+    suspend fun gold(): GoldRates? {
         if (Config.GOLD_URL.isBlank()) return null
         val body = get(Config.GOLD_URL) ?: return null
         return try {
             val j = JSONObject(body)
-            Gold(j.getInt("k24"), j.getInt("k21"), j.getInt("k18"), j.getInt("pound"))
+            GoldRates(j.getInt("k24"), j.getInt("k21"), j.getInt("k18"), j.getInt("pound"))
         } catch (e: Exception) {
             null
         }
